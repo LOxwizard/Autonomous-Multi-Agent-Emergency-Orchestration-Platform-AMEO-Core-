@@ -1,4 +1,5 @@
 import asyncio
+from datetime import datetime
 from config import DisasterEvent
 from agents.simulator import SimulatorAgent
 from agents.planner import PlannerAgent
@@ -6,64 +7,63 @@ from agents.broadcaster import BroadcasterAgent
 from agents.responder import ResponderAgent
 
 async def run_disaster_pipeline():
-    print("===============================================================")
-    print("       MULTI-AGENT EMERGENCY ORCHESTRATION SYSTEM             ")
-    print("===============================================================")
+    print("==================================================================================")
+    print("         AEGIS-NET: COMMAND & CONTROL AUTOMATED EMERGENCY ORCHESTRATOR           ")
+    print("==================================================================================")
     
-    # User Inputs
-    print("\n--- ENTER DISASTER SIMULATION DATA ---")
-    disaster_type = input("Enter Disaster Type (e.g., Earthquake, Cyclone, Flood): ").strip()
+    print("\n[INPUT INGESTION] ENTER INCIDENT DATA:")
+    disaster_type = input("  > Disaster Type (e.g., Earthquake, Cyclone, Flood): ").strip()
     
     try:
-        metric_val = float(input("Enter Severity Value (e.g., 4.5 for magnitude, 120 for wind speed in km/h): ").strip())
+        metric_val = float(input("  > Severity Value (e.g., 6.8 for Richter, 140 for km/h): ").strip())
     except ValueError:
-        print("Invalid number entered. Defaulting metric to 5.0")
         metric_val = 5.0
         
-    unit = input("Enter Metric Unit (e.g., Magnitude, km/h, meters): ").strip()
-    location = input("Enter Location / Zone (e.g., Sector 7, Coastal Zone A): ").strip()
+    unit = input("  > Metric Unit (e.g., Richter Magnitude, km/h, meters): ").strip()
+    location = input("  > Incident Location (e.g., Coastal Zone 4, Metro Sector 1): ").strip()
 
-    # Create Event Object
     event = DisasterEvent(
         disaster_type=disaster_type if disaster_type else "Earthquake",
         severity_metric=metric_val,
         unit=unit if unit else "Magnitude",
-        location_name=location if location else "Zone 1"
+        location_name=location if location else "Sector 1"
     )
 
-    # Initialize Agents
     simulator = SimulatorAgent()
     planner = PlannerAgent()
     broadcaster = BroadcasterAgent()
-    responder = ResponderAgent(unit_id="Field-Unit-Alpha")
+    responder = ResponderAgent()
 
-    # Pipeline Step 1: Simulator Assessment
-    print("\n================ STEP 1: DAMAGE SIMULATION ================")
-    impact_data = simulator.evaluate_disaster(event)
-    await asyncio.sleep(0.5)
+    # PHASE 1: SIMULATOR TELEMETRY
+    print("\n=================== PHASE 1: TELEMETRY & DAMAGE ASSESSMENT ===================")
+    impact = simulator.evaluate_disaster(event)
+    print(f"  LOCATION        : {impact['location']} (Grid Target: {impact['coordinates']})")
+    print(f"  IMPACT SCORE    : {impact['severity_score']}")
+    print(f"  DAMAGE RADIUS   : {impact['damage_radius_km']} km")
+    print(f"  EST. POPULATION : {impact['estimated_affected_pop']:,} citizens at risk")
+    await asyncio.sleep(0.4)
 
-    # Pipeline Step 2: Planning & Strategy
-    print("\n================ STEP 2: PLAN OF ACTION ================")
-    plan = planner.generate_plan(impact_data)
+    # PHASE 2: TACTICAL PLANNING
+    print("\n=================== PHASE 2: STRATEGIC ACTION DIRECTIVE ===================")
+    plan = planner.generate_plan(impact)
+    print("  PRIORITIZED RESPONSE PROTOCOLS:")
+    for m in plan.priority_measures:
+        print(f"    [{m['priority']}] {m['description']}")
+        print(f"         └─ Allocated Assets: {m['assets']}")
+    await asyncio.sleep(0.4)
+
+    # PHASE 3: MULTI-CHANNEL PUBLIC BROADCAST
+    print("\n=================== PHASE 3: MULTI-CHANNEL EMERGENCY DISPATCH ===================")
+    await broadcaster.broadcast_alerts(plan)
+    await asyncio.sleep(0.4)
+
+    # PHASE 4: FIELD RESPONDER EXECUTION
+    print("\n=================== PHASE 4: FIELD UNIT DEPLOYMENT TELEMETRY ===================")
+    await responder.execute_assignments(plan.assigned_units)
     
-    print(f"\nThreat Level Assessed: {plan.threat_level}")
-    print("Prioritized Measures to Take:")
-    for measure in plan.priority_measures:
-        print(f"  {measure}")
-    await asyncio.sleep(0.5)
-
-    # Pipeline Step 3: Public Broadcaster
-    print("\n================ STEP 3: PUBLIC ALERT BROADCAST ================")
-    alert_msg = broadcaster.build_public_alert(plan)
-    await broadcaster.broadcast_alerts(alert_msg)
-    await asyncio.sleep(0.5)
-
-    # Pipeline Step 4: Responder Field Execution
-    print("\n================ STEP 4: FIELD OPERATIONAL EXECUTION ================")
-    responder.execute_assignments(plan.assigned_routes)
-    
-    print("\n================ PROCESS COMPLETE ================")
-    print("All dynamic agent workflows executed for review session.")
+    print("\n==================================================================================")
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] ALL AGENT WORKFLOWS EXECUTED SUCCESSFULLY.")
+    print("==================================================================================")
 
 if __name__ == "__main__":
     asyncio.run(run_disaster_pipeline())

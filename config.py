@@ -3,20 +3,23 @@ from typing import List, Dict, Any
 
 @dataclass
 class DisasterEvent:
-    disaster_type: str        # e.g., "Earthquake", "Cyclone", "Flood"
-    severity_metric: float    # e.g., 4.5 for Richter magnitude, 120 for wind speed (km/h)
-    unit: str                 # e.g., "Magnitude", "km/h", "meters"
-    location_name: str        # e.g., "Visakhapatnam Zone 2"
+    disaster_type: str
+    severity_metric: float
+    unit: str
+    location_name: str
+    coordinates: Dict[str, int] = field(default_factory=lambda: {"x": 12, "y": 45})
 
 @dataclass
 class PlanOfAction:
     disaster_type: str
     threat_level: str
-    priority_measures: List[str]
-    assigned_routes: List[Dict[str, Any]]
+    damage_radius_km: float
+    priority_measures: List[Dict[str, Any]]
+    assigned_units: List[Dict[str, Any]]
 
 @dataclass
-class AlertMessage:
-    channel: str              # e.g., "Cell Broadcast", "Radio", "Siren Grid"
-    alert_level: str          # e.g., "CRITICAL", "WARNING", "ADVISORY"
-    public_instruction: str
+class ChannelAlert:
+    channel_name: str
+    header: str
+    message: str
+    severity_code: str

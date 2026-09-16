@@ -2,47 +2,42 @@ from typing import Dict, Any, List
 from config import PlanOfAction
 
 class PlannerAgent:
-    """Generates prioritized strategic actions and deployment plans based on simulator assessment."""
+    """Tactical orchestration engine computing dynamic triage priorities and unit routes."""
     
     def generate_plan(self, impact_data: Dict[str, Any]) -> PlanOfAction:
-        print(f"\n[Planner] Computing optimal Plan of Action for threat level: {impact_data['severity_score']}...")
+        print(f"\n[TACTICAL PLANNER] Synthesizing command directives for threat level: {impact_data['severity_score']}...")
         
         disaster_type = impact_data["disaster_type"].lower()
-        severity = impact_data["severity_score"]
         
-        priorities = []
-        
-        # Determine dynamic priorities based on disaster profile
         if "earthquake" in disaster_type:
-            priorities = [
-                "1. Immediate structural triage and heavy search & rescue in collapsed collapse zones.",
-                "2. Shut down gas supply mainlines to prevent secondary urban fires.",
-                "3. Deploy mobile medical field units to target coordinates."
+            measures = [
+                {"priority": "P1", "description": "Deploy heavy USAR (Urban Search & Rescue) to collapsed structures.", "assets": "K9 Units, Acoustic Sensors"},
+                {"priority": "P2", "description": "Isolate natural gas mainlines at distribution substations to prevent fire breakout.", "assets": "Automated Shutoff Valves"},
+                {"priority": "P3", "description": "Establish Mobile Triage units at safe perimeter coordinates.", "assets": "Field Hospitals, Ambulances"}
             ]
         elif "cyclone" in disaster_type:
-            priorities = [
-                "1. Mandatory evacuation of coastal and low-lying storm surge areas.",
-                "2. Clear main arterial roads of fallen debris/trees for emergency vehicles.",
-                "3. Distribute emergency power backup generators to local hospitals."
+            measures = [
+                {"priority": "P1", "description": "Execute mandatory evacuation protocol for low-lying coastal surge sectors.", "assets": "Transport Busses, Air-Siren Arrays"},
+                {"priority": "P2", "description": "Clear primary arterial evacuation corridors of debris and fallen high-voltage lines.", "assets": "Heavy Machinery Teams"},
+                {"priority": "P3", "description": "Stage emergency diesel generators at municipal hospitals and water treatment plants.", "assets": "Logistics Fleets"}
             ]
         else:
-            priorities = [
-                "1. Deploy water extraction pumps and inflatable rescue boats.",
-                "2. Move trapped populations to high-ground shelters.",
-                "3. Deliver clean drinking water packets to prevent waterborne disease."
+            measures = [
+                {"priority": "P1", "description": "Deploy rapid-response swiftwater rescue craft to trapped residential sectors.", "assets": "Zodiac Boats, Helicopter Hoists"},
+                {"priority": "P2", "description": "Construct high-capacity water diversion barriers around power grid hubs.", "assets": "Sandbag Deployers"},
+                {"priority": "P3", "description": "Distribute emergency survival rations and medical supplies to high-ground shelters.", "assets": "Supply Drones"}
             ]
 
-        if severity == "CRITICAL":
-            priorities.insert(0, "0. [URGENT] Request national disaster relief reinforcements.")
-
-        routes = [
-            {"unit": "Alpha-1", "objective": "Sector 4 Triage Point", "status": "Dispatched"},
-            {"unit": "Beta-2", "objective": "Evacuation Center Hub", "status": "En Route"}
+        units = [
+            {"unit_id": "RESCUE-ALPHA", "objective": "Sector 4 Triage Grid", "status": "DISPATCHED", "eta": "8 Mins"},
+            {"unit_id": "LOGISTICS-BETA", "objective": "Evacuation Route Corridor B", "status": "EN ROUTE", "eta": "14 Mins"},
+            {"unit_id": "HAZMAT-DELTA", "objective": "Utility Isolation Point 2", "status": "STAGED", "eta": "3 Mins"}
         ]
 
         return PlanOfAction(
             disaster_type=impact_data["disaster_type"],
-            threat_level=severity,
-            priority_measures=priorities,
-            assigned_routes=routes
+            threat_level=impact_data["severity_score"],
+            damage_radius_km=impact_data["damage_radius_km"],
+            priority_measures=measures,
+            assigned_units=units
         )
